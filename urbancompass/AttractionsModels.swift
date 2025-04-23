@@ -9,10 +9,18 @@ import Foundation
 
 struct ApiResponse: Decodable {
     let attractions: [Attraction]
+    
+    enum CodingKeys: String, CodingKey {
+        case attractions = "features"
+    }
 }
 
 struct Attraction: Decodable {
     let attributes: Attributes
+    
+    enum CodingKeys: String, CodingKey {
+        case attributes
+    }
 }
 
 struct Attributes: Decodable, Identifiable {
