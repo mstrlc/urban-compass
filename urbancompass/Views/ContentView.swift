@@ -6,36 +6,14 @@
 //
 
 import SwiftUI
-
-enum ScreensEnum {
-    case list, map
-}
+import Foundation
 
 struct ContentView: View {
-    @State var currentScreen: ScreensEnum = .list
-    
     var body: some View {
         
-        TabView(selection: $currentScreen) {
-            
-            AttractionListView()
-                .tag(ScreensEnum.list)
-                .tabItem {
-                    VStack {
-                        Image(systemName: "list.bullet")
-                        Text("List")
-                    }
-                }
-            
-            AttractionMapView()
-                .tag(ScreensEnum.map)
-                .tabItem {
-                    VStack {
-                        Image(systemName: "map")
-                        Text("Map")
-                    }
-                }
-        }
+        AttractionMapView()
+            .accentColor(.orange)
+            .tint(.orange)
     }
 }
 
