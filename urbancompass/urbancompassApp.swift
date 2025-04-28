@@ -5,8 +5,8 @@
 //  Created by Matyáš Strelec on 23.04.2025.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct urbancompassApp: App {

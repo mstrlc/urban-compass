@@ -5,8 +5,8 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct AttractionDetailView: View {
     let attributes: Attributes
@@ -18,7 +18,7 @@ struct AttractionDetailView: View {
                     Text(attributes.name ?? "Attraction")
                         .font(.title)
                         .fontWeight(.heavy)
-                    if(attributes.street != nil || attributes.city != nil) {
+                    if attributes.street != nil || attributes.city != nil {
                         Text("\(attributes.street ?? ""), \(attributes.city ?? "")")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
@@ -33,13 +33,11 @@ struct AttractionDetailView: View {
                             .font(.title2)
                             .foregroundColor(.orange)
                     }
-
                 }
             }
             .padding([.leading, .trailing], 20)
 
             VStack(alignment: .leading, spacing: 16) {
-
                 if let imageURL = attributes.image, let url = URL(string: imageURL) {
                     AsyncImage(url: url) { phase in
                         switch phase {
@@ -48,7 +46,7 @@ struct AttractionDetailView: View {
                                 Color.gray.opacity(0.1)
                                 ProgressView()
                             }
-                        case .success(let image):
+                        case let .success(image):
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
@@ -70,14 +68,13 @@ struct AttractionDetailView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-
                     if let text = attributes.text {
                         Text(text)
                             .font(.body)
                             .foregroundColor(.primary)
                             .lineLimit(isTextExpanded ? nil : 3)
                             .padding(.top, 8)
-                        
+
                         Button(action: {
                             isTextExpanded.toggle()
                         }) {
@@ -86,7 +83,7 @@ struct AttractionDetailView: View {
                                 .foregroundColor(.accentColor)
                         }
                     }
-                    
+
                     if let urlString = attributes.url, let url = URL(string: urlString) {
                         Link(destination: url) {
                             Text("Visit Website")
@@ -113,4 +110,8 @@ struct AttractionDetailView: View {
             .padding()
         }
     }
+}
+
+#Preview {
+    AttractionMapView()
 }

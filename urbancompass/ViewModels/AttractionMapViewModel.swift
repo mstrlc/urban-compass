@@ -5,10 +5,9 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
-
 import Foundation
-import SwiftUI
 import MapKit
+import SwiftUI
 
 @MainActor
 class AttractionMapViewModel: ObservableObject {
@@ -27,7 +26,7 @@ class AttractionMapViewModel: ObservableObject {
 
     func fetchData() {
         guard let url = URL(string: attractionsURLString) else {
-            self.errorMessage = "Invalid API URL"
+            errorMessage = "Invalid API URL"
             return
         }
 
@@ -38,12 +37,12 @@ class AttractionMapViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = false
                 switch result {
-                case .success(let fetchedAttributes):
+                case let .success(fetchedAttributes):
                     self.attractions = fetchedAttributes
                     if fetchedAttributes.isEmpty {
                         self.errorMessage = "Successfully loaded but no attractions were returned"
                     }
-                case .failure(let error):
+                case let .failure(error):
                     if let decodingError = error as? DecodingError {
                         self.errorMessage = "Data Parsing Error:\n\(decodingError)"
                     } else {

@@ -5,22 +5,21 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
-import Foundation
 import CoreLocation
+import Foundation
 
 extension String {
     /// Attempts to unescape HTML entities within the string.
     /// - Returns: A new string with HTML entities decoded, or the original string if decoding fails.
     func unescapingHTMLEntities() -> String {
-
-        guard let data = self.data(using: .utf8) else {
+        guard let data = data(using: .utf8) else {
             return self // Return original string if UTF8 conversion fails
         }
 
         // Define options for NSAttributedString initialization
         let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
             .documentType: NSAttributedString.DocumentType.html,
-            .characterEncoding: String.Encoding.utf8.rawValue // Specify UTF-8 encoding
+            .characterEncoding: String.Encoding.utf8.rawValue, // Specify UTF-8 encoding
         ]
 
         // Try to initialize NSAttributedString from the HTML data
@@ -34,7 +33,7 @@ extension String {
 
 struct ApiResponse: Decodable {
     let attractions: [Attraction]
-    
+
     enum CodingKeys: String, CodingKey {
         case attractions = "features"
     }
@@ -42,7 +41,7 @@ struct ApiResponse: Decodable {
 
 struct Attraction: Decodable {
     let attributes: Attributes
-    
+
     enum CodingKeys: String, CodingKey {
         case attributes
     }
@@ -50,7 +49,7 @@ struct Attraction: Decodable {
 
 struct Attributes: Decodable, Identifiable, Hashable {
     var id: UUID
-    
+
     let name: String?
     let text: String?
     let image: String?
@@ -62,14 +61,14 @@ struct Attributes: Decodable, Identifiable, Hashable {
     let email: String?
     let latitude: Double?
     let longitude: Double?
-    
+
     var coordinate: CLLocationCoordinate2D? {
         guard let lat = latitude, let lon = longitude else {
             return nil
         }
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case id = "GlobalID"
         case street = "address_street"
@@ -78,7 +77,7 @@ struct Attributes: Decodable, Identifiable, Hashable {
         case email = "contact_email"
         case name, text, image, url, address, latitude, longitude
     }
-    
+
     init(id: UUID, name: String?, text: String?, image: String?, url: String?, address: String?, street: String?, city: String?, phone: String?, email: String?, latitude: Double?, longitude: Double?) {
         self.id = id
         self.name = name
@@ -93,7 +92,7 @@ struct Attributes: Decodable, Identifiable, Hashable {
         self.latitude = latitude
         self.longitude = longitude
     }
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -129,7 +128,7 @@ struct Attributes: Decodable, Identifiable, Hashable {
 
 extension URLSession {
     func fetchAttractions(at url: URL, completion: @escaping (Result<[Attributes], Error>) -> Void) {
-        self.dataTask(with: url) { (data, response, error) in
+        dataTask(with: url) { data, _, error in
             if let error = error {
                 DispatchQueue.main.async { completion(.failure(error)) }
                 return

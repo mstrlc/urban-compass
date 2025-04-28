@@ -5,10 +5,10 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
-import SwiftUI
-import MapKit
-import Foundation
 import CoreLocation
+import Foundation
+import MapKit
+import SwiftUI
 
 struct MapAnnotationView: View {
     let isActive: Bool
@@ -50,7 +50,7 @@ struct AttractionMapView: View {
         center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     ))
-    
+
     func pickRandomAttraction() {
         if let randomAttraction = viewModel.attractions.randomElement() {
             viewModel.activeAttraction = randomAttraction
@@ -103,7 +103,7 @@ struct AttractionMapView: View {
                         Image(systemName: "map")
                             .font(.title2)
                             .foregroundColor(.orange)
-                        
+
                         Text("Attractions")
                             .font(.title)
                             .fontWeight(.heavy)
@@ -116,10 +116,9 @@ struct AttractionMapView: View {
                                 .font(.title2)
                                 .foregroundColor(.orange)
                         }
-                       
                     }
                     .padding([.top, .leading, .trailing], 20)
-                    
+
                     if viewModel.isLoading {
                         Spacer()
                         ProgressView("Loading")
@@ -158,12 +157,12 @@ struct AttractionMapView: View {
                     viewModel.fetchData()
                 }
             }
-            .onChange(of: viewModel.navigationPath) { oldValue, newValue in
+            .onChange(of: viewModel.navigationPath) { _, newValue in
                 viewModel.syncSelectionFromNavigation(newPath: newValue)
                 viewModel.selectedDetent = .fraction(0.3)
             }
         }
-        .onChange(of: viewModel.activeAttraction) { oldValue, newValue in
+        .onChange(of: viewModel.activeAttraction) { _, newValue in
             viewModel.syncNavigationAndSelection(newActive: newValue)
             viewModel.selectedDetent = .fraction(0.3)
             if let selected = newValue, let coordinate = selected.coordinate {

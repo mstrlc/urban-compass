@@ -5,8 +5,8 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
-import SwiftUI
 import Foundation
+import SwiftUI
 
 struct AttractionRow: View {
     let attributes: Attributes
@@ -23,7 +23,7 @@ struct AttractionRow: View {
                             ProgressView()
                         }
 
-                    case .success(let image):
+                    case let .success(image):
                         image
                             .resizable()
                             .scaledToFill()
@@ -50,8 +50,8 @@ struct AttractionRow: View {
                     .lineLimit(1)
 
                 Text(attributes.street != nil || attributes.city != nil
-                     ? "\(attributes.street ?? ""), \(attributes.city ?? "")"
-                     : (attributes.text ?? ""))
+                    ? "\(attributes.street ?? ""), \(attributes.city ?? "")"
+                    : (attributes.text ?? ""))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(2)
