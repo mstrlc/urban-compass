@@ -5,12 +5,17 @@
 //  Created by Matyáš Strelec on 22.04.2025.
 //
 
+import CoreLocation
 import Foundation
 import SwiftUI
 
 struct AttractionDetailView: View {
     let attributes: Attributes
+
     @State private var isTextExpanded: Bool = false
+    @State private var userLocation: CLLocation?
+    @State private var distanceToAttraction: String = ""
+
     var body: some View {
         ScrollView {
             HStack(alignment: .firstTextBaseline) {
@@ -29,6 +34,10 @@ struct AttractionDetailView: View {
 
                 if let latitude = attributes.latitude, let longitude = attributes.longitude {
                     Link(destination: URL(string: "maps:0,0?q=\(latitude),\(longitude)")!) {
+                        if !distanceToAttraction.isEmpty {
+                            Text("\(distanceToAttraction)")
+                                .font(.subheadline)
+                        }
                         Image(systemName: "location.fill")
                             .font(.title2)
                             .foregroundColor(.orange)
@@ -108,6 +117,34 @@ struct AttractionDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding()
+        }
+        .onAppear {
+            fetchUserLocation()
+        }
+        .onChange(of: attributes) {
+            fetchUserLocation()
+        }
+    }
+
+    func fetchUserLocation() {
+        let locationManager = CLLocationManager()
+        locationManager.requestWhenInUseAuthorization()
+
+        if let userLocation = locationManager.location {
+            self.userLocation = userLocation
+            calculateDistance()
+        }
+    }
+
+    func calculateDistance() {
+        if let userLocation = userLocation,
+           let latitude = attributes.latitude,
+           let longitude = attributes.longitude
+        {
+            let attractionLocation = CLLocation(latitude: latitude, longitude: longitude)
+            let distanceInMeters = userLocation.distance(from: attractionLocation)
+            let distanceInKilometers = distanceInMeters / 1000 // convert to kilometers
+            distanceToAttraction = String(format: "%.2f km", distanceInKilometers)
         }
     }
 }

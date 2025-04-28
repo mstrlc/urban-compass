@@ -29,9 +29,22 @@
 		6855817A2DB95D8400480E2B /* urbancompassUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = urbancompassUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		68DF60D12DC03BFC0042AA6D /* Exceptions for "urbancompass" folder in "urbancompass" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 685581602DB95D8300480E2B /* urbancompass */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		685581632DB95D8300480E2B /* urbancompass */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				68DF60D12DC03BFC0042AA6D /* Exceptions for "urbancompass" folder in "urbancompass" target */,
+			);
 			path = urbancompass;
 			sourceTree = "<group>";
 		};
