@@ -13,10 +13,11 @@ struct AttractionRow: View {
     let attributes: Attributes
     var userLocation: CLLocationCoordinate2D?
 
-    private let rowHeight: CGFloat = 60
+    private let rowHeight: CGFloat = 45
 
     var body: some View {
         HStack(spacing: 12) {
+            // Display image from URL or fallback placeholder
             if let imageUrl = attributes.image, let url = URL(string: imageUrl) {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -25,15 +26,12 @@ struct AttractionRow: View {
                             Color.gray.opacity(0.1)
                             ProgressView()
                         }
-
                     case let .success(image):
                         image
                             .resizable()
                             .scaledToFill()
-
                     case .failure:
                         placeholderImage
-
                     @unknown default:
                         placeholderImage
                     }
@@ -46,6 +44,7 @@ struct AttractionRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
             }
 
+            // Display name and location/address
             VStack(alignment: .leading, spacing: 4) {
                 Text(attributes.name ?? "Name not available")
                     .font(.headline)
@@ -57,7 +56,7 @@ struct AttractionRow: View {
                     : (attributes.text ?? ""))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                    .lineLimit(2)
+                    .lineLimit(1)
             }
 
             Spacer()

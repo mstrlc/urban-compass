@@ -127,6 +127,10 @@ struct Attributes: Decodable, Identifiable, Hashable {
 }
 
 extension URLSession {
+    /// Fetches the list of attractions from the provided URL.
+    /// - Parameters:
+    ///   - url: The URL to fetch the data from.
+    ///   - completion: A closure that receives the result of the fetch, containing either an array of `Attributes` or an error.
     func fetchAttractions(at url: URL, completion: @escaping (Result<[Attributes], Error>) -> Void) {
         dataTask(with: url) { data, _, error in
             if let error = error {
