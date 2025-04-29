@@ -6,3 +6,10 @@ It lets you browse the map, finding attractions in your area. The detail view al
 
 This app was created as an exercise in Swift and SwiftUI, getting to use new features like MapKit, and attempting to use modern UI elements, like bottom sheets.
 The data is pulled from the ArcGIS API, allowing easy expansion to other datasets providing data in the same format in the future.
+
+<p align="center">
+  <img src="doc/screenshots/map.png" width="22%">
+  <img src="doc/screenshots/list.png" width="22%">
+  <img src="doc/screenshots/map-detail.png" width="22%">
+  <img src="doc/screenshots/detail.png" width="22%">
+</p>
