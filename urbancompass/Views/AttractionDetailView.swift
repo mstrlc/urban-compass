@@ -55,6 +55,8 @@ struct AttractionDetailView: View {
                                 Color.gray.opacity(0.1)
                                 ProgressView()
                             }
+                            .cornerRadius(12)
+                            .frame(height: 150)
                         case let .success(image):
                             image
                                 .resizable()
@@ -87,29 +89,51 @@ struct AttractionDetailView: View {
                         Button(action: {
                             isTextExpanded.toggle()
                         }) {
-                            Text(isTextExpanded ? "Show Less" : "Show More")
-                                .font(.body)
-                                .foregroundColor(.accentColor)
+                            HStack {
+                                Image(systemName: "ellipsis")
+                                    .foregroundColor(.accentColor)
+                                Text(isTextExpanded ? "Show Less" : "Show More")
+                                    .font(.body)
+                                    .foregroundColor(.accentColor)
+                            }
                         }
                     }
 
                     if let urlString = attributes.url, let url = URL(string: urlString) {
                         Link(destination: url) {
-                            Text("Visit Website")
-                                .font(.body)
-                                .foregroundColor(.accentColor)
+                            HStack {
+                                Image(systemName: "globe")
+                                    .foregroundColor(.accentColor)
+                                Text(urlString)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                            }
                         }
                         .padding(.top, 8)
                     }
 
-                    if let latitude = attributes.latitude, let longitude = attributes.longitude {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Latitude: \(latitude)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text("Longitude: \(longitude)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                    if let email = attributes.email {
+                        Link(destination: URL(string: "mailto:\(email)")!) {
+                            HStack {
+                                Image(systemName: "envelope.fill")
+                                    .foregroundColor(.accentColor)
+                                Text(email)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                        .padding(.top, 8)
+                    }
+
+                    if let phone = attributes.phone {
+                        Link(destination: URL(string: "tel:\(phone)")!) {
+                            HStack {
+                                Image(systemName: "phone.fill")
+                                    .foregroundColor(.accentColor)
+                                Text(phone)
+                                    .font(.body)
+                                    .foregroundColor(.primary)
+                            }
                         }
                         .padding(.top, 8)
                     }
