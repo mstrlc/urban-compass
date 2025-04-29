@@ -10,6 +10,14 @@ import Foundation
 import MapKit
 import SwiftUI
 
+// Calculate distance between two coordinates
+func distanceBetween(_ coordinate1: CLLocationCoordinate2D, _ coordinate2: CLLocationCoordinate2D) -> CLLocationDistance {
+    let location1 = CLLocation(latitude: coordinate1.latitude, longitude: coordinate1.longitude)
+    let location2 = CLLocation(latitude: coordinate2.latitude, longitude: coordinate2.longitude)
+    return location1.distance(from: location2)
+}
+
+// Custom annotation view for displaying attraction pins on the map
 struct MapAnnotationView: View {
     let isActive: Bool
 
@@ -28,21 +36,6 @@ struct MapAnnotationView: View {
     }
 }
 
-struct UserLocationView: View {
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.blue)
-                .frame(width: 24, height: 24)
-                .shadow(radius: 5)
-
-            Image(systemName: "location.fill")
-                .foregroundColor(.white)
-                .font(.system(size: 14))
-        }
-    }
-}
-
 struct AttractionMapView: View {
     @StateObject private var viewModel = AttractionMapViewModel()
     @StateObject private var locationManager = LocationManager()
@@ -50,7 +43,18 @@ struct AttractionMapView: View {
         center: CLLocationCoordinate2D(latitude: 49.1951, longitude: 16.6068),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     ))
+    @State private var filterHasLocation: FilterLocation = .both
+    @State private var sortOrder: SortOrder = .distance
 
+    enum SortOrder {
+        case defaultOrder, name, distance
+    }
+
+    enum FilterLocation {
+        case both, withLocation, withoutLocation
+    }
+
+    // Select and zoom to a random attraction
     func pickRandomAttraction() {
         if let randomAttraction = viewModel.attractions.randomElement() {
             viewModel.activeAttraction = randomAttraction
@@ -73,12 +77,12 @@ struct AttractionMapView: View {
                         .tag(attraction)
                     }
                 }
-
-                if let userLocation = locationManager.userLocation {
-                    Annotation("User Location", coordinate: userLocation) {
-                        UserLocationView()
-                    }
-                }
+                UserAnnotation()
+            }
+            .mapControls {
+                MapScaleView()
+                MapCompass()
+                MapPitchToggle()
             }
             .mapStyle(.standard(pointsOfInterest: .excludingAll))
 

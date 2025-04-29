@@ -13,7 +13,7 @@ struct AttractionDetailView: View {
     let attributes: Attributes
 
     @State private var isTextExpanded: Bool = false
-    @State private var userLocation: CLLocation?
+    @State private var userLocation: CLLocationCoordinate2D?
     @State private var distanceToAttraction: String = ""
 
     var body: some View {
@@ -119,32 +119,24 @@ struct AttractionDetailView: View {
             .padding()
         }
         .onAppear {
-            fetchUserLocation()
+            requestLocationAndCalculateDistance()
         }
         .onChange(of: attributes) {
-            fetchUserLocation()
+            requestLocationAndCalculateDistance()
         }
     }
 
-    func fetchUserLocation() {
+    // Function to request the user's location and calculate the distance to the attraction
+    func requestLocationAndCalculateDistance() {
         let locationManager = CLLocationManager()
         locationManager.requestWhenInUseAuthorization()
 
-        if let userLocation = locationManager.location {
-            self.userLocation = userLocation
-            calculateDistance()
-        }
-    }
-
-    func calculateDistance() {
-        if let userLocation = userLocation,
-           let latitude = attributes.latitude,
-           let longitude = attributes.longitude
-        {
-            let attractionLocation = CLLocation(latitude: latitude, longitude: longitude)
-            let distanceInMeters = userLocation.distance(from: attractionLocation)
-            let distanceInKilometers = distanceInMeters / 1000 // convert to kilometers
-            distanceToAttraction = String(format: "%.2f km", distanceInKilometers)
+        if let location = locationManager.location {
+            userLocation = location.coordinate
+            distanceToAttraction = LocationUtils.formattedDistance(
+                from: location.coordinate,
+                to: attributes.coordinate
+            )
         }
     }
 }
