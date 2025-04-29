@@ -107,6 +107,7 @@ struct AttractionDetailView: View {
                                 Text(urlString)
                                     .font(.body)
                                     .foregroundColor(.primary)
+                                    .lineLimit(1)
                             }
                         }
                         .padding(.top, 8)
@@ -120,6 +121,7 @@ struct AttractionDetailView: View {
                                 Text(email)
                                     .font(.body)
                                     .foregroundColor(.primary)
+                                    .lineLimit(1)
                             }
                         }
                         .padding(.top, 8)
