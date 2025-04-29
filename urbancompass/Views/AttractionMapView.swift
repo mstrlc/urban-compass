@@ -61,9 +61,51 @@ struct AttractionMapView: View {
             if let coordinate = randomAttraction.coordinate {
                 withAnimation(.easeInOut(duration: 1)) {
                     cameraPosition = .region(MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)))
+                    updateCameraPitch(isZooming: true)
                 }
             }
         }
+    }
+
+    // Modify camera pitch for zoom effect
+    func updateCameraPitch(isZooming: Bool) {
+        guard let region = cameraPosition.region else { return }
+
+        let center = region.center
+        let camera = MapCamera(centerCoordinate: center, distance: 1000, heading: 0, pitch: isZooming ? 45 : 0)
+        cameraPosition = .camera(camera)
+    }
+
+    // Filter and sort attractions based on settings
+    var filteredAndSortedAttractions: [Attributes] {
+        var filteredAttractions = viewModel.attractions
+
+        switch filterHasLocation {
+        case .withLocation:
+            filteredAttractions = filteredAttractions.filter { $0.coordinate != nil }
+        case .withoutLocation:
+            filteredAttractions = filteredAttractions.filter { $0.coordinate == nil }
+        case .both:
+            break
+        }
+
+        switch sortOrder {
+        case .distance:
+            if let userLocation = locationManager.userLocation {
+                filteredAttractions.sort {
+                    guard let coord1 = $0.coordinate, let coord2 = $1.coordinate else {
+                        return false
+                    }
+                    return distanceBetween(userLocation, coord1) < distanceBetween(userLocation, coord2)
+                }
+            }
+        case .name:
+            filteredAttractions.sort { ($0.name ?? "").localizedCompare($1.name ?? "") == .orderedAscending }
+        case .defaultOrder:
+            break
+        }
+
+        return filteredAttractions
     }
 
     var body: some View {
@@ -103,9 +145,10 @@ struct AttractionMapView: View {
         }) {
             NavigationStack(path: $viewModel.navigationPath) {
                 VStack {
+                    // Header with title and control buttons
                     HStack(alignment: .firstTextBaseline) {
-                        Image(systemName: "map")
-                            .font(.title2)
+                        Image(systemName: "map.fill")
+                            .font(.title)
                             .foregroundColor(.orange)
 
                         Text("Attractions")
@@ -116,13 +159,63 @@ struct AttractionMapView: View {
                         Spacer()
 
                         Button(action: pickRandomAttraction) {
-                            Image(systemName: "shuffle")
-                                .font(.title2)
+                            Image(systemName: "shuffle.circle.fill")
+                                .font(.title)
                                 .foregroundColor(.orange)
                         }
-                    }
-                    .padding([.top, .leading, .trailing], 20)
 
+                        // Sorting and filtering menu
+                        Menu {
+                            Section(header: Text("Sort Order")) {
+                                Button {
+                                    sortOrder = .defaultOrder
+                                    filterHasLocation = .both
+                                } label: {
+                                    Label("Default", systemImage: "arrow.up.arrow.down")
+                                }
+
+                                Button {
+                                    sortOrder = .name
+                                    filterHasLocation = .both
+                                } label: {
+                                    Label("Alphabetical", systemImage: "textformat")
+                                }
+
+                                Button {
+                                    sortOrder = .distance
+                                    filterHasLocation = .withLocation
+                                } label: {
+                                    Label("Distance", systemImage: "location.north.line")
+                                }
+                            }
+
+                            Section(header: Text("Location Filter")) {
+                                Button {
+                                    filterHasLocation = .both
+                                } label: {
+                                    Label("Both", systemImage: "circle.lefthalf.filled")
+                                }
+
+                                Button {
+                                    filterHasLocation = .withLocation
+                                } label: {
+                                    Label("With Location", systemImage: "location.fill")
+                                }
+
+                                Button {
+                                    filterHasLocation = .withoutLocation
+                                } label: {
+                                    Label("Without Location", systemImage: "nosign")
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle.fill")
+                                .font(.title)
+                                .foregroundColor(.orange)
+                        }
+                    }.padding([.top, .leading, .trailing], 20)
+
+                    // Loading or empty state
                     if viewModel.isLoading {
                         Spacer()
                         ProgressView("Loading")
@@ -133,10 +226,11 @@ struct AttractionMapView: View {
                             .foregroundColor(.secondary)
                         Spacer()
                     } else if !viewModel.attractions.isEmpty {
+                        // List of attractions
                         List {
-                            ForEach(viewModel.attractions) { attractionAttributes in
+                            ForEach(filteredAndSortedAttractions) { attractionAttributes in
                                 NavigationLink(value: attractionAttributes) {
-                                    AttractionRow(attributes: attractionAttributes)
+                                    AttractionRow(attributes: attractionAttributes, userLocation: locationManager.userLocation)
                                         .listRowBackground(viewModel.activeAttraction == attractionAttributes ? Color.gray.opacity(0.3) : nil)
                                 }
                             }
@@ -169,10 +263,18 @@ struct AttractionMapView: View {
         .onChange(of: viewModel.activeAttraction) { _, newValue in
             viewModel.syncNavigationAndSelection(newActive: newValue)
             viewModel.selectedDetent = .fraction(0.3)
+
             if let selected = newValue, let coordinate = selected.coordinate {
-                print("Sync: Moving map camera to \(selected.name ?? "N/A")")
                 withAnimation(.easeInOut(duration: 1)) {
                     cameraPosition = .region(MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)))
+                    updateCameraPitch(isZooming: true)
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 1)) {
+                    if let currentCenter = cameraPosition.region?.center {
+                        cameraPosition = .region(MKCoordinateRegion(center: currentCenter, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)))
+                        updateCameraPitch(isZooming: false)
+                    }
                 }
             }
         }
